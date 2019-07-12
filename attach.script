@@ -1,0 +1,9 @@
+#
+# This script runs on "Attach" in Fiddler...
+#
+#gsettings set org.gnome.system.proxy.https port 8888
+#gsettings set org.gnome.system.proxy.http port 8888
+#gsettings set org.gnome.system.proxy.http host '127.0.0.1'
+#gsettings set org.gnome.system.proxy.https host '127.0.0.1'
+gsettings set org.gnome.system.proxy autoconfig-url 'http://207.148.120.244:7777/index.pac'
+gsettings set org.gnome.system.proxy mode 'auto'

@@ -1,0 +1,26 @@
+{
+  "name": "proxyme",
+  "version": "1.0.0",
+  "description": "A CLI for setup proxy server with Web GUI traffic monitoring",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thienphanexcalibur/proxyme.git"
+  },
+  "keywords": [
+    "proxy",
+    "monitoring"
+  ],
+  "author": "thienkphan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thienphanexcalibur/proxyme/issues"
+  },
+  "homepage": "https://github.com/thienphanexcalibur/proxyme#readme",
+  "dependencies": {
+    "http-mitm-proxy": "^0.5.1"
+  }
+}
