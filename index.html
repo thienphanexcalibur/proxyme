@@ -2,11 +2,38 @@
 <html>
   <head>
       <script src="socket.io.js"></script>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+      <style>
+          #requestContainer {
+            padding: 50px;
+          }
+          .request {
+            color: white;
+            display: block;
+            font-weight: bold;
+          }
+        </style>
   </head>
-  <script>
-     const socket = io.connect('http://localhost:2303');
-  </script>
-  <body>
-    <h1>aaaaa</h1>
+  <body style="background-color: black">
+    <div class="web-gui">
+      <div class="request" id="requestContainer">
+
+      </div>
+    </div>
   </body>
+   <script>
+     const socket = io('http://localhost:2300');
+     const requestContainer = document.getElementById('requestContainer');
+     console.log(requestContainer)
+
+     socket.on('soundcheck', (data) => {
+        console.log(data);
+     });
+     socket.on('request', (data) => {
+       const newRequestNode = document.createElement('a');
+       newRequestNode.setAttribute('class', 'request');
+       newRequestNode.innerText = data;
+       requestContainer.appendChild(newRequestNode);
+     })
+  </script>
 </html>

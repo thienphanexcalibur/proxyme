@@ -8,7 +8,6 @@ const http = require('http');
 const path = require('path');
 
 
-
 const server = http.createServer((req, res) => {
   const staticBasePath = './';
   var resolvedBase = path.resolve(staticBasePath);
@@ -36,13 +35,17 @@ const server = http.createServer((req, res) => {
   });
 });
 
-const io = require('socket.io')(server);
-
 server.listen({
   port: 2300
 }, () => {
   console.log('Debug server is running');
 });
+
+const io = require('socket.io')(server);
+io.on('connection', (socket) => {
+  socket.emit('soundcheck', 'hello');
+});
+
 
 module.exports = function proxyMe({
   pac,
@@ -60,10 +63,12 @@ module.exports = function proxyMe({
     const host = ctx.clientToProxyRequest.headers.host;
     // Log
     console.log(remoteAddress, ' requests ', ctx.clientToProxyRequest.url);
-    const stream = fs.createWriteStream('requesttemp', {
-      flags: 'a'
-    });
-    stream.write(url + '\n');
+
+    // Transport to socket
+
+    io.emit('request', `${remoteAddress} requests   ${url}`)
+
+
     // If https protocol
     if (ctx.proxyToServerRequestOptions.agent.protocol === 'https:') {
       ctx.isSSL = false;
