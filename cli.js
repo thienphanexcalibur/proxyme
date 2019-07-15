@@ -1,33 +1,74 @@
 const inq = require('inquirer');
 const minimist = require('minimist');
-const yamlParser = require('js-yaml');
 const fs = require('fs');
+const path = require('path');
 const isEmpty = require('lodash/isEmpty');
-const proxyMe = require('./index.js');
+const proxyMe = require('./proxyme.js');
 
-let publicProfilePath = './profiles';
-const defaultProfilePath =  publicProfilePath + '/default.yaml';
+let publicPath = './';
+
+const profilePath =  publicPath + 'profiles';
+const defaultProfilePath = path.normalize(path.join(__dirname, profilePath, 'default.json'));
+
+const configPath = publicPath + 'config';
+const defaultConfigPath = path.normalize(path.join(__dirname, configPath, 'config.json'));
+
+console.log(defaultConfigPath);
+console.log(defaultProfilePath);
 
 
-function getProfileData(profilePath) {
-  return yamlParser.safeLoad(fs.readFileSync(profilePath || defaultProfilePath, 'utf-8'));
-}
 const argsCLI = minimist(process.argv.slice(2));
 delete argsCLI._;
+
 console.log('A CLI to create a proxy with PAC script');
 
-function argsSchema(args) {
-  this.pac =  args.pac;
-  this.pacHost = args.pacHost || null;
-  this.pacPort = args.pacPort || null;
-  this.proxyHost = args.proxyHost || '0.0.0.0';
-  this.proxyPort = args.proxyPort || 6789;
-  this.profilePath = args.profilePath || defaultProfilePath;
+function cli(args) {
+  this.pac =  typeof args.pac === 'string' ? args.pac : null;
+  this.pacHost = typeof args.pacHost === 'string' ? args.pacHost : null;
+  this.pacPort = typeof args.pacPort === 'number' ? args.pacPort : null;
+  this.proxyHost = typeof args.proxyHost === 'string' ? args.proxyHost : '0.0.0.0';
+  this.proxyPort = typeof args.proxyPort === 'number' ? args.proxyPort : 6969;
+  this._configPath = typeof args.configPath === 'string' ? args.configPath : defaultConfigPath;
+  this._profilePath = typeof args.profilePath === 'string' ? args.profilePath : defaultProfilePath;
+  this.debugHost = typeof args.debugHost === 'string' ? args.debugHost : '0.0.0.0';
+  this.debugPort = typeof args.debugPort === 'number' ? args.debugPort : 2300;
+  this.rules = args.rules instanceof Object ? args.rules : {};
 }
 
-// Merge arguments passed from CLI to arguments schema
+/**
+ * @param {String} _path
+ * Get configuration
+ * (Static Method)
+ */
+cli.getConfig = function (_path = '') {
+  return JSON.parse(fs.readFileSync(_path ? path.join(__dirname, configPath, _path) : defaultProfilePath));
+}
 
-const finalArgs = new argsSchema((isEmpty(argsCLI) ? false : argsCLI) || getProfileData(argsCLI.profilePath));
+/**
+ *
+ * @param {String} _path
+ * TODO: Support multiple profiles at a time
+ * Get profiles
+ * (Static Method)
+ */
+cli.getProfiles = function (_path = '') {
+  return JSON.parse(fs.readFileSync(_path ? path.join(__dirname, profilePath, _path) : defaultProfilePath));
+}
+
+/**
+ * @param {String} configPath | Passed from CLI
+ * @param {String} profilePath | Passed from CLI
+ * (Static Method)
+ */
+cli.mergeArgs = function (configPath = '', profilePath = '') {
+  return Object.assign(this.getConfig(configPath), this.getProfiles(profilePath), argsCLI);
+}
+
+
+// Merge arguments passed from CLI to arguments schema
+const condition = !!(argsCLI.profilePath && argsCLI.configPath);
+
+const finalArgs = new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath));
 
 const {
   pac,
@@ -35,7 +76,9 @@ const {
   pacPort,
   proxyHost,
   proxyPort,
-  profilePath
+  _profilePath,
+  debugHost,
+  debugPort
 } = finalArgs
 
 const questions = [];

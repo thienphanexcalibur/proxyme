@@ -1,0 +1,5 @@
+{
+  "rules": {
+    "coccoc.com": "localhost:8080"
+  }
+}
