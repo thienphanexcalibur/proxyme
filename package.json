@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/thienphanexcalibur/proxyme#readme",
   "dependencies": {
-    "http-mitm-proxy": "^0.5.1"
+    "http-mitm-proxy": "^0.5.1",
+    "request": "^2.88.0",
+    "socket.io": "^2.2.0"
   }
 }

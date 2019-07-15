@@ -4,40 +4,42 @@ const yamlParser = require('js-yaml');
 const fs = require('fs');
 const isEmpty = require('lodash/isEmpty');
 const proxyMe = require('./index.js');
-const profilePath = './profiles';
-const profileDoc = yamlParser.safeLoad(fs.readFileSync(profilePath + '/test.yaml', 'utf-8'));
 
+let publicProfilePath = './profiles';
+const defaultProfilePath =  publicProfilePath + '/default.yaml';
+
+
+function getProfileData(profilePath) {
+  return yamlParser.safeLoad(fs.readFileSync(profilePath || defaultProfilePath, 'utf-8'));
+}
 const argsCLI = minimist(process.argv.slice(2));
 delete argsCLI._;
-console.log(argsCLI);
 console.log('A CLI to create a proxy with PAC script');
 
-
 function argsSchema(args) {
-  this.pac =  args.pac || '0.0.0.0:6969';
+  this.pac =  args.pac;
   this.pacHost = args.pacHost || null;
   this.pacPort = args.pacPort || null;
   this.proxyHost = args.proxyHost || '0.0.0.0';
   this.proxyPort = args.proxyPort || 6789;
-  this.profile = args.profile || './profiles/test.yaml';
+  this.profilePath = args.profilePath || defaultProfilePath;
 }
-
-
 
 // Merge arguments passed from CLI to arguments schema
 
-const finalArgs = new argsSchema((isEmpty(argsCLI) ? false : argsCLI) || profileDoc);
+const finalArgs = new argsSchema((isEmpty(argsCLI) ? false : argsCLI) || getProfileData(argsCLI.profilePath));
+
 const {
   pac,
   pacHost,
   pacPort,
   proxyHost,
   proxyPort,
-  profile
+  profilePath
 } = finalArgs
 
 const questions = [];
-  if (!profile) {
+  if (!profilePath) {
   questions.push({
     type: 'confirm',
     name: 'proxy',
@@ -50,18 +52,15 @@ const questions = [];
      message: 'Your PAC server address:',
      default: pac
    })
-
-  if (profile)
   questions.push({
     type: 'input',
     name: 'profiles',
     message: 'Proxy profiles: (path: profile.yml)',
-    default: profile
+    default: profilePath
   });
   }
 
 module.exports = (async () => {
-
-  proxyMe(finalArgs);
   const answers = await inq.prompt(questions);
+  proxyMe(finalArgs);
 })();
