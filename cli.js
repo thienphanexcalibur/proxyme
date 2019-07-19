@@ -4,35 +4,61 @@ const fs = require('fs');
 const path = require('path');
 const isEmpty = require('lodash/isEmpty');
 const proxyMe = require('./proxyme.js');
+const chalk = require('chalk');
 
-let publicPath = './';
-
-const profilePath =  publicPath + 'profiles';
-const defaultProfilePath = path.normalize(path.join(__dirname, profilePath, 'default.json'));
-
-const configPath = publicPath + 'config';
-const defaultConfigPath = path.normalize(path.join(__dirname, configPath, 'config.json'));
-
-console.log(defaultConfigPath);
-console.log(defaultProfilePath);
-
+if (!fs.existsSync(path.join(__dirname, 'proxyme'))) {
+  fs.mkdirSync(path.join(__dirname, 'proxyme'));
+}
 
 const argsCLI = minimist(process.argv.slice(2));
 delete argsCLI._;
+// console.log(argsCLI);
 
-console.log('A CLI to create a proxy with PAC script');
+// Set public path
+const publicPath = argsCLI.publicPath ? argsCLI.publicPath : path.join(__dirname, 'proxyme');
+
+const profileDirPath = path.join(publicPath, 'profiles');
+const defaultProfilePath = path.normalize(path.join(profileDirPath, 'default.json'));
+const configDirPath = path.join(publicPath, 'config');
+const defaultConfigPath = path.normalize(path.join(configDirPath, 'config.json'));
+
+function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort}) {
+  // Set default profile path and
+
+  // Check if dir exists
+  if (!fs.existsSync(profileDirPath)) {
+    fs.mkdirSync(profileDirPath);
+    fs.writeFileSync(defaultProfilePath, JSON.stringify({
+      "rules": []
+    }));
+  }
+
+  if (!fs.existsSync(configDirPath)) {
+    fs.mkdirSync(configDirPath);
+    fs.writeFileSync(defaultConfigPath, JSON.stringify({
+      pac: pac,
+      proxyHost: proxyHost,
+      proxyPort: proxyPort,
+      debugHost: debugHost,
+      debugPort: debugPort,
+      publicPath: publicPath
+    }));
+  }
+}
+
+console.log(chalk.bgWhite.black('A CLI to create a proxy with PAC script'));
 
 function cli(args) {
-  this.pac =  typeof args.pac === 'string' ? args.pac : null;
-  this.pacHost = typeof args.pacHost === 'string' ? args.pacHost : null;
-  this.pacPort = typeof args.pacPort === 'number' ? args.pacPort : null;
-  this.proxyHost = typeof args.proxyHost === 'string' ? args.proxyHost : '0.0.0.0';
-  this.proxyPort = typeof args.proxyPort === 'number' ? args.proxyPort : 6969;
-  this._configPath = typeof args.configPath === 'string' ? args.configPath : defaultConfigPath;
-  this._profilePath = typeof args.profilePath === 'string' ? args.profilePath : defaultProfilePath;
-  this.debugHost = typeof args.debugHost === 'string' ? args.debugHost : '0.0.0.0';
-  this.debugPort = typeof args.debugPort === 'number' ? args.debugPort : 2300;
-  this.rules = args.rules instanceof Object ? args.rules : {};
+  this.pac =  typeof args.pac === 'string' && args.pac;
+  this.pacHost = typeof args.pacHost === 'string' && args.pacHost;
+  this.pacPort = typeof args.pacPort === 'number' && args.pacPort;
+  this.proxyHost = typeof args.proxyHost === 'string' && args.proxyHost;
+  this.proxyPort = typeof args.proxyPort === 'number' && args.proxyPort;
+  this._configPath = typeof args.configPath === 'string' &&  args.configPath;
+  this._profilePath = typeof args.profilePath === 'string' && args.profilePath;
+  this.debugHost = typeof args.debugHost === 'string' && args.debugHost;
+  this.debugPort = typeof args.debugPort === 'number' && args.debugPort;
+  this.rules = args.rules instanceof Array ? args.rules : [];
 }
 
 /**
@@ -40,8 +66,8 @@ function cli(args) {
  * Get configuration
  * (Static Method)
  */
-cli.getConfig = function (_path = '') {
-  return JSON.parse(fs.readFileSync(_path ? path.join(__dirname, configPath, _path) : defaultProfilePath));
+cli.getConfig = function (_path = "") {
+  return JSON.parse(fs.readFileSync(_path ? _path : defaultConfigPath));
 }
 
 /**
@@ -51,8 +77,8 @@ cli.getConfig = function (_path = '') {
  * Get profiles
  * (Static Method)
  */
-cli.getProfiles = function (_path = '') {
-  return JSON.parse(fs.readFileSync(_path ? path.join(__dirname, profilePath, _path) : defaultProfilePath));
+cli.getProfiles = function (_path = "") {
+  return JSON.parse(fs.readFileSync(_path ? _path : defaultProfilePath));
 }
 
 /**
@@ -65,45 +91,50 @@ cli.mergeArgs = function (configPath = '', profilePath = '') {
 }
 
 
-// Merge arguments passed from CLI to arguments schema
-const condition = !!(argsCLI.profilePath && argsCLI.configPath);
-
-const finalArgs = new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath));
-
-const {
-  pac,
-  pacHost,
-  pacPort,
-  proxyHost,
-  proxyPort,
-  _profilePath,
-  debugHost,
-  debugPort
-} = finalArgs
-
 const questions = [];
-  if (!profilePath) {
-  questions.push({
-    type: 'confirm',
-    name: 'proxy',
-    message: 'Do you have proxy enable?',
-    default: false
-  });
-  questions.push({
-     type: 'input',
-     name: 'pac',
-     message: 'Your PAC server address:',
-     default: pac
-   })
   questions.push({
     type: 'input',
-    name: 'profiles',
-    message: 'Proxy profiles: (path: profile.yml)',
-    default: profilePath
+    name: 'proxyHost',
+    message: 'Your proxy host:',
+    default: '0.0.0.0'
   });
-  }
+
+  questions.push({
+    type: 'input',
+    name: 'input',
+    name: 'proxyPort',
+    message: 'Your proxy port:',
+    default: 6969
+  });
+  questions.push({
+    type: 'input',
+    name: 'pac',
+    message: 'Your PAC server address:',
+    default: ''
+  });
+  questions.push({
+    type: 'input',
+    name: 'debugHost',
+    message: 'Your debug server host ?:',
+    default: '0.0.0.0',
+  });
+  questions.push({
+    type: 'input',
+    name: 'debugPort',
+    message: 'Your debug server port ?:',
+    default: 2300
+  });
 
 module.exports = (async () => {
-  const answers = await inq.prompt(questions);
-  proxyMe(finalArgs);
+  let answers = {};
+  if (argsCLI.init) {
+    answers = await inq.prompt(questions);
+    init(answers);
+    console.log('Your settings: ', {...answers});
+    proxyMe(answers);
+  } else {
+    const finalArgs = argsCLI.configPath ? new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath)) : cli.mergeArgs(null, argsCLI.profilePath);
+    console.log('Your settings', {...finalArgs});
+    proxyMe(finalArgs);
+  }
 })();

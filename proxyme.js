@@ -6,25 +6,24 @@ const {
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const chalk = require('chalk');
 
 module.exports = function proxyMe(args) {
-
+  // Destructuring arguments
   const {
     pac,
     proxyHost,
     proxyPort,
-    profilePath,
     debugHost,
-    debugPort
+    debugPort,
+    rules
   } = args;
 
-  console.log(args);
-
   /* Setup debug server to display all traffics from proxy */
-  const server = http.createServer((req, res) => {
+  const debugServer = http.createServer((req, res) => {
     const staticBasePath = './';
-    var resolvedBase = path.resolve(staticBasePath);
-    var safeSuffix = path.normalize(req.url).replace(/^(\.\.[\/\\])+/, '');
+    const resolvedBase = path.resolve(staticBasePath);
+    const safeSuffix = path.normalize(req.url).replace(/^(\.\.[\/\\])+/, '');
     let fileLoc = path.join(resolvedBase, safeSuffix);
 
     if (req.url === '/') {
@@ -47,15 +46,14 @@ module.exports = function proxyMe(args) {
         return res.end();
     });
   });
-
-  server.listen({
+  debugServer.listen({
     host: debugHost,
     port: debugPort
   }, () => {
-    console.log('Debug server is running at ',`http://${debugHost}:${debugPort}`);
+    console.log(chalk.bgGreen.black(`Debug server is running at  http://${debugHost}:${debugPort}`));
   });
 
-  const io = require('socket.io')(server);
+  const io = require('socket.io')(debugServer);
   io.on('connection', (socket) => {
     socket.emit('soundcheck', 'hello');
   });
@@ -77,19 +75,22 @@ module.exports = function proxyMe(args) {
     // Transport to socket
     io.emit('request', `${remoteAddress} requests ${url}`)
 
-
+    console.log(ctx.proxyToServerRequestOptions.agent.protocol);
     // If https protocol
     if (ctx.proxyToServerRequestOptions.agent.protocol === 'https:') {
-      ctx.isSSL = false;
+      ctx.isSSL = false;;
       ctx.proxyToServerRequestOptions.agent = proxy.httpAgent;
     }
-    // Put host conditions here
-    if (host === 'coccoc.com') {
-      if (url.match(/ntp-mobile/)) {
-        ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace('/ntp-mobile/', '/');
-        ctx.proxyToServerRequestOptions.host = 'localhost';
-        ctx.proxyToServerRequestOptions.port = '8080'
-      }
+
+    for(ruleHost in rules) {
+      const path = ctx.proxyToServerRequestOptions.path;
+      if (host === String(ruleHost)) {
+        if (path.length > 0) {
+            ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(path, '/');
+          }
+          ctx.proxyToServerRequestOptions.host = rules[ruleHost][0];
+          ctx.proxyToServerRequestOptions.port = rules[ruleHost][1];
+        }
     }
     callback();
   });
@@ -109,6 +110,9 @@ module.exports = function proxyMe(args) {
     spawn('bash', ['detach.script'], {
       cwd: path.join(__dirname, 'scripts')
     });
-    process.exit();
+    debugServer.close();
+    debugServer.on('close', function () {
+      process.exit(1);
+    })
   });
 };
