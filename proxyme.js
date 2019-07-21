@@ -21,7 +21,7 @@ module.exports = function proxyMe(args) {
 
   /* Setup debug server to display all traffics from proxy */
   const debugServer = http.createServer((req, res) => {
-    const staticBasePath = './';
+    const staticBasePath = __dirname;
     const resolvedBase = path.resolve(staticBasePath);
     const safeSuffix = path.normalize(req.url).replace(/^(\.\.[\/\\])+/, '');
     let fileLoc = path.join(resolvedBase, safeSuffix);
@@ -30,7 +30,7 @@ module.exports = function proxyMe(args) {
       res.writeHead(200, {
         'Content-Type': 'text/html'
       });
-      fileLoc = 'index.html';
+      fileLoc = path.join(fileLoc, 'index.html');
     }
 
     fs.readFile(fileLoc, function(err, data) {
