@@ -14,7 +14,7 @@ const argsCLI = minimist(process.argv.slice(2));
 delete argsCLI._;
 
 // Set public path, default './'
-const publicPath = argsCLI.publicPath ? argsCLI.publicPath : path.join(__dirname);
+const publicPath = argsCLI.publicPath ? argsCLI.publicPath : './';
 
 // If not exist create one
 if (!fs.existsSync(publicPath)) {
