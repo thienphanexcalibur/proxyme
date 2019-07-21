@@ -75,21 +75,22 @@ module.exports = function proxyMe(args) {
     // Transport to socket
     io.emit('request', `${remoteAddress} requests ${url}`)
 
-    console.log(ctx.proxyToServerRequestOptions.agent.protocol);
     // If https protocol
     if (ctx.proxyToServerRequestOptions.agent.protocol === 'https:') {
       ctx.isSSL = false;;
       ctx.proxyToServerRequestOptions.agent = proxy.httpAgent;
     }
 
-    for(ruleHost in rules) {
-      const path = ctx.proxyToServerRequestOptions.path;
-      if (host === String(ruleHost)) {
-        if (path.length > 0) {
-            ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(path, '/');
+    for(rule in rules) {
+      const extractURLSegments = rule.split('/');
+      const extractHost = extractURLSegments[0];
+      const extractPath = extractURLSegments[1];
+      if (host === extractHost) {
+          if (extractPath) {
+            ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(extractPath, '/')
           }
-          ctx.proxyToServerRequestOptions.host = rules[ruleHost][0];
-          ctx.proxyToServerRequestOptions.port = rules[ruleHost][1];
+          ctx.proxyToServerRequestOptions.host = rules[rule][0];
+          ctx.proxyToServerRequestOptions.port = rules[rule][1];
         }
     }
     callback();
