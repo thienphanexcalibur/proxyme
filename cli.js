@@ -4,10 +4,23 @@ const inq = require('inquirer');
 const minimist = require('minimist');
 const fs = require('fs');
 const path = require('path');
-const isEmpty = require('lodash/isEmpty');
 const proxyMe = require('./proxyme.js');
 const chalk = require('chalk');
+const commander = require('commander');
 
+
+commander
+  .option('-i, --init', 'Init proxyme')
+  .option('-path, --publicPath', 'set your proxyme public path, where to generate necessary files - default ./')
+  .option('-h , --proxyHost', 'your proxy host - default 0.0.0.0')
+  .option('-p, --proxyPort', 'your proxy port - default 6969')
+  .option('-H, --debugHost', 'your debug host - default 0.0.0.0')
+  .option('-P, --debugPort', 'your debug port - default 2300')
+  .option('--pac', 'your PAC (Proxy Auto-Config) URL:')
+  .option('--config', 'your config path')
+  .option('--profile', 'your profile contain rules path')
+  .version('1.3.3')
+  .parse(process.argv);
 
 
 const argsCLI = minimist(process.argv.slice(2));
