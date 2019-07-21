@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const inq = require('inquirer');
 const minimist = require('minimist');
 const fs = require('fs');
@@ -6,16 +8,18 @@ const isEmpty = require('lodash/isEmpty');
 const proxyMe = require('./proxyme.js');
 const chalk = require('chalk');
 
-if (!fs.existsSync(path.join(__dirname, 'proxyme'))) {
-  fs.mkdirSync(path.join(__dirname, 'proxyme'));
-}
+
 
 const argsCLI = minimist(process.argv.slice(2));
 delete argsCLI._;
-// console.log(argsCLI);
 
-// Set public path
-const publicPath = argsCLI.publicPath ? argsCLI.publicPath : path.join(__dirname, 'proxyme');
+// Set public path, default './'
+const publicPath = argsCLI.publicPath ? argsCLI.publicPath : path.join(__dirname);
+
+// If not exist create one
+if (!fs.existsSync(publicPath)) {
+  fs.mkdirSync(publicPath);
+}
 
 const profileDirPath = path.join(publicPath, 'profiles');
 const defaultProfilePath = path.normalize(path.join(profileDirPath, 'default.json'));
