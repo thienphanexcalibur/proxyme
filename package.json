@@ -1,10 +1,11 @@
 {
-  "name": "proxyme",
-  "version": "1.0.0",
+  "name": "coccoc-proxyme",
+  "version": "1.1.0",
   "description": "A CLI for setup proxy server with Web GUI traffic monitoring",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "debug": "nodemon --inspect ./cli.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,10 @@
   "dependencies": {
     "http-mitm-proxy": "^0.5.1",
     "request": "^2.88.0",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.2.0",
+    "inquirer": "^6.5.0",
+    "minimist": "^1.2.0",
+    "chalk": "^2.4.2",
+    "lodash": "^4.17.15"
   }
 }
