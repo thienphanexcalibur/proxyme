@@ -19,7 +19,7 @@ commander
   .option('--pac', 'your PAC (Proxy Auto-Config) URL:')
   .option('--config', 'your config path')
   .option('--profile', 'your profile contain rules path')
-  .version('1.3.3')
+  .version('1.3.5')
   .parse(process.argv);
 
 
@@ -46,7 +46,7 @@ function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort}) {
   if (!fs.existsSync(profileDirPath)) {
     fs.mkdirSync(profileDirPath);
     fs.writeFileSync(defaultProfilePath, JSON.stringify({
-      "rules": []
+      "rules": {"example.com":["",""]}
     }));
   }
 
