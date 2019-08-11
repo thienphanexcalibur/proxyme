@@ -7,11 +7,15 @@ const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const chalk = require('chalk');
+const attachProxy = require('./scripts/attach');
+const detachProxy = require('./scripts/detach');
+const pacServer = require('./pacserver');
+const rulesParse = require('./lib/rulesParse');
 
 module.exports = function proxyMe(args) {
   // Destructuring arguments
   const {
-    pac,
+    pacPort,
     proxyHost,
     proxyPort,
     debugHost,
@@ -57,12 +61,14 @@ module.exports = function proxyMe(args) {
   io.on('connection', (socket) => {
     socket.emit('soundcheck', 'hello');
   });
+  console.log(rulesParse);
+  const { domains, urls } = rulesParse(rules);
 
   /** */
   // Inject global PAC file for determine proxy traffics
-  spawn('bash', ['attach.script', '--pac', pac], {
-    cwd: path.join(__dirname, 'scripts')
-  });
+
+  pacServer({ host: proxyHost, pacPort, proxyPort, domains, urls })
+  const autoproxySettings = attachProxy(`http://localhost:${pacPort}/`);
 
   proxy.onRequest(function (ctx, callback) {
     ctx.use(Proxy.gunzip);
@@ -108,12 +114,11 @@ module.exports = function proxyMe(args) {
   })
   // Revert global proxy configuration
   process.on('SIGINT', () => {
-    spawn('bash', ['detach.script'], {
-      cwd: path.join(__dirname, 'scripts')
-    });
-    debugServer.close();
+    console.log('exiting');
+    detachProxy(autoproxySettings);
     debugServer.on('close', function () {
       process.exit(1);
-    })
+    });
+    debugServer.close();
   });
 };
