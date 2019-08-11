@@ -12,11 +12,11 @@ const commander = require('commander');
 commander
   .option('-i, --init', 'Init proxyme')
   .option('-path, --publicPath', 'set your proxyme public path, where to generate necessary files - default ./')
-  .option('-h , --proxyHost', 'your proxy host - default 0.0.0.0')
-  .option('-p, --proxyPort', 'your proxy port - default 6969')
-  .option('-H, --debugHost', 'your debug host - default 0.0.0.0')
-  .option('-P, --debugPort', 'your debug port - default 2300')
-  .option('--pac', 'your PAC (Proxy Auto-Config) URL:')
+  .option('-h , --proxyHost', 'your proxy host - default 127.0.0.1')
+  .option('-p, --proxyPort', 'your proxy port - default RANDOM')
+  .option('-H, --debugHost', 'your debug host - default 127.0.0.1')
+  .option('-P, --debugPort', 'your debug port - default RANDOM + 1')
+  .option('--pacPort', 'your PAC (Proxy Auto-Config) port - default RANDOM + 2')
   .option('--config', 'your config path')
   .option('--profile', 'your profile contain rules path')
   .version('1.3.5')
@@ -39,7 +39,7 @@ const defaultProfilePath = path.normalize(path.join(profileDirPath, 'default.jso
 const configDirPath = path.join(publicPath, 'config');
 const defaultConfigPath = path.normalize(path.join(configDirPath, 'config.json'));
 
-function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort}) {
+function init({publicPath, pacPort, proxyHost, proxyPort, debugHost, debugPort}) {
   // Set default profile path and
 
   // Check if dir exists
@@ -50,10 +50,12 @@ function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort}) {
     }));
   }
 
-  if (!fs.existsSync(configDirPath)) {
-    fs.mkdirSync(configDirPath);
+  if (!fs.existsSync(defaultConfigPath)) {
+    try {
+      fs.mkdirSync(configDirPath);
+    } catch (e) { };
     fs.writeFileSync(defaultConfigPath, JSON.stringify({
-      pac: pac,
+      pacPort: pacPort,
       proxyHost: proxyHost,
       proxyPort: proxyPort,
       debugHost: debugHost,
@@ -66,8 +68,6 @@ function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort}) {
 console.log(chalk.bgWhite.black('A CLI to create a proxy with PAC script'));
 
 function cli(args) {
-  this.pac =  typeof args.pac === 'string' && args.pac;
-  this.pacHost = typeof args.pacHost === 'string' && args.pacHost;
   this.pacPort = typeof args.pacPort === 'number' && args.pacPort;
   this.proxyHost = typeof args.proxyHost === 'string' && args.proxyHost;
   this.proxyPort = typeof args.proxyPort === 'number' && args.proxyPort;
@@ -107,7 +107,7 @@ cli.mergeArgs = function (configPath = '', profilePath = '') {
   return Object.assign(this.getConfig(configPath), this.getProfiles(profilePath), argsCLI);
 }
 
-
+const randomPort = Math.floor(4096 + (Math.random() * 16384));
 const questions = [];
   questions.push({
     type: 'input',
@@ -121,13 +121,13 @@ const questions = [];
     name: 'input',
     name: 'proxyPort',
     message: 'Your proxy port:',
-    default: 6969
+    default: randomPort
   });
   questions.push({
     type: 'input',
-    name: 'pac',
-    message: 'Your PAC server address:',
-    default: ''
+    name: 'pacPort',
+    message: 'Your PAC server port:',
+    default: randomPort + 2
   });
   questions.push({
     type: 'input',
@@ -139,7 +139,7 @@ const questions = [];
     type: 'input',
     name: 'debugPort',
     message: 'Your debug server port ?:',
-    default: 2300
+    default: randomPort + 1
   });
 
 module.exports = (async () => {
