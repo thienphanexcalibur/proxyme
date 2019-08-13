@@ -29,17 +29,16 @@ const argsCLI = minimist(process.argv.slice(2));
 delete argsCLI._;
 
 // Set public path, default './'
-const publicPath = argsCLI.publicPath ? argsCLI.publicPath : './';
+const publicPath = path.resolve(argsCLI.publicPath ? argsCLI.publicPath : './');
 
 // If not exist create one
 if (!fs.existsSync(publicPath)) {
   fs.mkdirSync(publicPath);
 }
-
-const profileDirPath = path.join(publicPath, 'profiles');
-const defaultProfilePath = path.normalize(path.join(profileDirPath, 'default.json'));
-const configDirPath = path.join(publicPath, 'config');
-const defaultConfigPath = path.normalize(path.join(configDirPath, 'config.json'));
+const profileDirPath = path.resolve(path.join(publicPath, 'profiles'));
+const defaultProfilePath = path.resolve(path.join(profileDirPath, 'default.js'));
+const configDirPath = path.resolve(path.join(publicPath, 'config'));
+const defaultConfigPath = path.resolve(path.join(configDirPath, 'config.json'));
 
 // eslint-disable-next-line no-shadow
 function init({ publicPath, pacPort, proxyHost, proxyPort, debugHost, debugPort }) {
@@ -104,7 +103,7 @@ cli.getConfig = function (_path = '') {
  */
 
 cli.getProfiles = function (_path = '') {
-  return JSON.parse(fs.readFileSync(_path ? _path : defaultProfilePath));
+  return require(_path ? _path : defaultProfilePath);
 }
 
 /**
