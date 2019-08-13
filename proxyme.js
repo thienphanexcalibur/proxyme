@@ -1,8 +1,6 @@
+/* global __dirname, process */
 const Proxy = require('http-mitm-proxy');
 const proxy = Proxy();
-const {
-  spawn
-} = require('child_process');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
@@ -27,7 +25,7 @@ module.exports = function proxyMe(args) {
   const debugServer = http.createServer((req, res) => {
     const staticBasePath = __dirname;
     const resolvedBase = path.resolve(staticBasePath);
-    const safeSuffix = path.normalize(req.url).replace(/^(\.\.[\/\\])+/, '');
+    const safeSuffix = path.normalize(req.url).replace(/^(\.\.[/\\])+/, '');
     let fileLoc = path.join(resolvedBase, safeSuffix);
 
     if (req.url === '/') {
@@ -61,8 +59,8 @@ module.exports = function proxyMe(args) {
   io.on('connection', (socket) => {
     socket.emit('soundcheck', 'hello');
   });
-  console.log(rulesParse);
-  const { domains, urls } = rulesParse(rules);
+
+  const { domains, urls, parsedRules } = rulesParse(rules);
 
   /** */
   // Inject global PAC file for determine proxy traffics
@@ -83,11 +81,11 @@ module.exports = function proxyMe(args) {
 
     // If https protocol
     if (ctx.proxyToServerRequestOptions.agent.protocol === 'https:') {
-      ctx.isSSL = false;;
+      ctx.isSSL = false;
       ctx.proxyToServerRequestOptions.agent = proxy.httpAgent;
     }
 
-    for(rule in rules) {
+    for(let rule in rules) {
       const extractURLSegments = rule.split('/');
       const extractHost = extractURLSegments[0];
       const extractPath = extractURLSegments[1];

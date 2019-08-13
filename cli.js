@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+/* eslint-disable no-sync */
+/* global process */
 
 const inq = require('inquirer');
 const minimist = require('minimist');
@@ -39,28 +41,33 @@ const defaultProfilePath = path.normalize(path.join(profileDirPath, 'default.jso
 const configDirPath = path.join(publicPath, 'config');
 const defaultConfigPath = path.normalize(path.join(configDirPath, 'config.json'));
 
-function init({publicPath, pacPort, proxyHost, proxyPort, debugHost, debugPort}) {
-  // Set default profile path and
+// eslint-disable-next-line no-shadow
+function init({ publicPath, pacPort, proxyHost, proxyPort, debugHost, debugPort }) {
 
-  // Check if dir exists
+  /*
+   * Set default profile path and
+   * Check if dir exists
+   */
+
   if (!fs.existsSync(profileDirPath)) {
     fs.mkdirSync(profileDirPath);
-    fs.writeFileSync(defaultProfilePath, JSON.stringify({
-      "rules": {"example.com":["",""]}
-    }));
+  }
+  if (!fs.existsSync(defaultProfilePath)) {
+    const rules = fs.readFileSync('./profiles/default.js');
+    fs.writeFileSync(defaultConfigPath, rules);
   }
 
+  if (!fs.existsSync(configDirPath)) {
+    fs.mkdirSync(configDirPath);
+  }
   if (!fs.existsSync(defaultConfigPath)) {
-    try {
-      fs.mkdirSync(configDirPath);
-    } catch (e) { };
     fs.writeFileSync(defaultConfigPath, JSON.stringify({
-      pacPort: pacPort,
-      proxyHost: proxyHost,
-      proxyPort: proxyPort,
-      debugHost: debugHost,
-      debugPort: debugPort,
-      publicPath: publicPath
+      pacPort,
+      proxyHost,
+      proxyPort,
+      debugHost,
+      debugPort,
+      publicPath
     }));
   }
 }
@@ -71,7 +78,7 @@ function cli(args) {
   this.pacPort = typeof args.pacPort === 'number' && args.pacPort;
   this.proxyHost = typeof args.proxyHost === 'string' && args.proxyHost;
   this.proxyPort = typeof args.proxyPort === 'number' && args.proxyPort;
-  this._configPath = typeof args.configPath === 'string' &&  args.configPath;
+  this._configPath = typeof args.configPath === 'string' && args.configPath;
   this._profilePath = typeof args.profilePath === 'string' && args.profilePath;
   this.debugHost = typeof args.debugHost === 'string' && args.debugHost;
   this.debugPort = typeof args.debugPort === 'number' && args.debugPort;
@@ -83,7 +90,8 @@ function cli(args) {
  * Get configuration
  * (Static Method)
  */
-cli.getConfig = function (_path = "") {
+
+cli.getConfig = function (_path = '') {
   return JSON.parse(fs.readFileSync(_path ? _path : defaultConfigPath));
 }
 
@@ -94,7 +102,8 @@ cli.getConfig = function (_path = "") {
  * Get profiles
  * (Static Method)
  */
-cli.getProfiles = function (_path = "") {
+
+cli.getProfiles = function (_path = '') {
   return JSON.parse(fs.readFileSync(_path ? _path : defaultProfilePath));
 }
 
@@ -103,6 +112,7 @@ cli.getProfiles = function (_path = "") {
  * @param {String} profilePath | Passed from CLI
  * (Static Method)
  */
+
 cli.mergeArgs = function (configPath = '', profilePath = '') {
   return Object.assign(this.getConfig(configPath), this.getProfiles(profilePath), argsCLI);
 }
@@ -118,7 +128,6 @@ const questions = [];
 
   questions.push({
     type: 'input',
-    name: 'input',
     name: 'proxyPort',
     message: 'Your proxy port:',
     default: randomPort
@@ -133,7 +142,7 @@ const questions = [];
     type: 'input',
     name: 'debugHost',
     message: 'Your debug server host ?:',
-    default: '0.0.0.0',
+    default: '0.0.0.0'
   });
   questions.push({
     type: 'input',
@@ -147,11 +156,11 @@ module.exports = (async () => {
   if (argsCLI.init) {
     answers = await inq.prompt(questions);
     init(answers);
-    console.log('Your settings: ', {...answers});
+    console.log('Your settings: ', { ...answers });
     proxyMe(answers);
   } else {
     const finalArgs = argsCLI.configPath ? new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath)) : cli.mergeArgs(null, argsCLI.profilePath);
-    console.log('Your settings', {...finalArgs});
+    console.log('Your settings', { ...finalArgs });
     proxyMe(finalArgs);
   }
 })();
