@@ -19,7 +19,7 @@ commander
   .option('--pac', 'your PAC (Proxy Auto-Config) URL:')
   .option('--config', 'your config path')
   .option('--profile', 'your profile contain rules path')
-  .version('1.3.5')
+  .version('1.3.6')
   .parse(process.argv);
 
 

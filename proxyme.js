@@ -11,6 +11,7 @@ const chalk = require('chalk');
 module.exports = function proxyMe(args) {
   // Destructuring arguments
   const {
+    publicPath,
     pac,
     proxyHost,
     proxyPort,
@@ -94,6 +95,10 @@ module.exports = function proxyMe(args) {
         }
     }
     callback();
+  });
+
+  spawn('bash', ['addcert.sh', '--publicPath', publicPath], {
+    cwd: path.join(__dirname,'scripts');
   });
 
 
