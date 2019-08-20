@@ -7,7 +7,6 @@ const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const chalk = require('chalk');
-
 module.exports = function proxyMe(args) {
   // Destructuring arguments
   const {
@@ -51,7 +50,7 @@ module.exports = function proxyMe(args) {
     host: debugHost,
     port: debugPort
   }, () => {
-    console.log(chalk.bgGreen.black(`Debug server is running at  http://${debugHost}:${debugPort}`));
+    console.log(chalk.bgGreen.black(`[DEBUG SERVER] Debug server is running at\nhttp://${debugHost}:${debugPort}\n`));
   });
 
   const io = require('socket.io')(debugServer);
@@ -82,6 +81,7 @@ module.exports = function proxyMe(args) {
       ctx.proxyToServerRequestOptions.agent = proxy.httpAgent;
     }
 
+    // Add more logic here
     for(rule in rules) {
       const extractURLSegments = rule.split('/');
       const extractHost = extractURLSegments[0];
@@ -97,8 +97,15 @@ module.exports = function proxyMe(args) {
     callback();
   });
 
-  spawn('bash', ['addcert.sh', '--publicPath', publicPath], {
-    cwd: path.join(__dirname,'scripts');
+  const certProcess = spawn('bash', ['addcert.sh', '--publicPath', process.cwd()], {
+    cwd: path.join(__dirname, 'scripts')
+  });
+
+  certProcess.stdout.on('data', (data) => {
+    // Log output
+    if (data.toString()) {
+      console.log(`${chalk.bgBlue.black(data.toString())}\n`);
+    }
   });
 
 
@@ -113,9 +120,11 @@ module.exports = function proxyMe(args) {
   })
   // Revert global proxy configuration
   process.on('SIGINT', () => {
+    console.log(chalk.bgWhite.black('\nRemoved global PAC configuration\n'), pac);
     spawn('bash', ['detach.script'], {
       cwd: path.join(__dirname, 'scripts')
     });
+    console.log(chalk.bgWhite.black('Removed proxyme certificate!'));
     debugServer.close();
     debugServer.on('close', function () {
       process.exit(1);

@@ -7,8 +7,9 @@ const path = require('path');
 const proxyMe = require('./proxyme.js');
 const chalk = require('chalk');
 const commander = require('commander');
-
-
+function getVersion() {
+  return require(path.join(__dirname,'package.json')).version;
+}
 commander
   .option('-i, --init', 'Init proxyme')
   .option('-path, --publicPath', 'set your proxyme public path, where to generate necessary files - default ./')
@@ -19,7 +20,7 @@ commander
   .option('--pac', 'your PAC (Proxy Auto-Config) URL:')
   .option('--config', 'your config path')
   .option('--profile', 'your profile contain rules path')
-  .version('1.3.6')
+  .version(getVersion())
   .parse(process.argv);
 
 
@@ -27,7 +28,8 @@ const argsCLI = minimist(process.argv.slice(2));
 delete argsCLI._;
 
 // Set public path, default './'
-const publicPath = argsCLI.publicPath ? argsCLI.publicPath : './';
+const publicPath = argsCLI.publicPath ? argsCLI.publicPath : process.cwd();
+
 
 // If not exist create one
 if (!fs.existsSync(publicPath)) {
@@ -151,7 +153,15 @@ module.exports = (async () => {
     proxyMe(answers);
   } else {
     const finalArgs = argsCLI.configPath ? new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath)) : cli.mergeArgs(null, argsCLI.profilePath);
-    console.log('Your settings', {...finalArgs});
+    console.log('Your PROXYME settings');
+    const {proxyHost, proxyPort, pac, debugHost, debugPort} = finalArgs;
+    console.log(`
+      PROXY HOST: ${proxyHost}
+      PROXY PORT: ${proxyPort}
+      PAC Address: ${pac}
+      DEBUG HOST: ${debugHost}
+      DEBUG PORT: ${debugPort}
+    `)
     proxyMe(finalArgs);
   }
 })();
