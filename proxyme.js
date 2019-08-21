@@ -81,20 +81,25 @@ module.exports = function proxyMe(args) {
       ctx.proxyToServerRequestOptions.agent = proxy.httpAgent;
     }
 
+    let hostMatched = rules[host];
     // Add more logic here
-    for(rule in rules) {
-      const extractURLSegments = rule.split('/');
-      const extractHost = extractURLSegments[0];
-      const extractPath = extractURLSegments[1];
-      if (host === extractHost) {
-          if (extractPath) {
-            ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(extractPath, '/')
+    // [NOTICE] Currently support only level 1 path
+      if (hostMatched) {
+      let [mapPaths, hostMapping] = hostMatched;
+          for(iterPath in mapPaths) {
+            const [mapPath, pathMapping] = mapPaths[iterPath];
+            if (url.match(new RegExp(iterPath))) {
+              ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(new RegExp(`/${iterPath}`), '');
+              ctx.proxyToServerRequestOptions.host = pathMapping.host;
+              ctx.proxyToServerRequestOptions.port = pathMapping.port;
+              return callback();
+            }
           }
-          ctx.proxyToServerRequestOptions.host = rules[rule][0];
-          ctx.proxyToServerRequestOptions.port = rules[rule][1];
-        }
+        ctx.proxyToServerRequestOptions.host = hostMapping.host;
+        ctx.proxyToServerRequestOptions.port = hostMapping.port;
     }
-    callback();
+
+    return callback();
   });
 
   const certProcess = spawn('bash', ['addcert.sh', '--publicPath', process.cwd()], {
