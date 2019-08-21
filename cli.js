@@ -48,8 +48,25 @@ function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort}) {
   if (!fs.existsSync(profileDirPath)) {
     fs.mkdirSync(profileDirPath);
     fs.writeFileSync(defaultProfilePath, JSON.stringify({
-      "rules": {"example.com":["",""]}
-    }));
+      "rules":
+        {
+          "example.com": [
+            {
+              "somepath": [
+                {},
+                {
+                  "host": "",
+                  "port": null
+                }
+              ]
+            },
+            {
+              "host": "",
+              "port": null
+            }
+          ]
+        }
+    }, null, '\t'));
   }
 
   if (!fs.existsSync(configDirPath)) {
@@ -61,7 +78,7 @@ function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort}) {
       debugHost: debugHost,
       debugPort: debugPort,
       publicPath: publicPath
-    }));
+    }, null, '\t'));
   }
 }
 
