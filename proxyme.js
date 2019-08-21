@@ -95,8 +95,10 @@ module.exports = function proxyMe(args) {
               return callback();
             }
           }
-        ctx.proxyToServerRequestOptions.host = hostMapping.host;
-        ctx.proxyToServerRequestOptions.port = hostMapping.port;
+        if (hostMapping && hostMapping instanceof Object) {
+          ctx.proxyToServerRequestOptions.host = hostMapping.host;
+          ctx.proxyToServerRequestOptions.port = hostMapping.port;
+        }
     }
 
     return callback();
