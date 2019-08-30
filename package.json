@@ -17,7 +17,7 @@
     "monitoring"
   ],
   "bin": {
-    "proxyme": "--tls-cipher-list='DES-CBC3-SHA' ./cli.js"
+    "proxyme": "./cli.js"
   },
   "author": "thienkphan",
   "license": "ISC",
