@@ -26,10 +26,12 @@ certpath="${PUBLICPATH}/.http-mitm-proxy/certs/ca.pem"
 
 #try/catch bash
 {
-  if [[$platform == 'Linux']]; then
+  if [ $platform == "Linux" ] 
+  then
 	  certutil -d sql:$HOME/.pki/nssdb -A -t "CT,C,C" -n "PROXYMECERT" -i $certpath
   fi
-  if [[$platform == 'Darwin']]; then
+  if [ $platform == "Darwin" ] 
+  then
 	  sudo security add-trusted-cert -d -r trustRoot -k $HOME/Library/Keychains/login.keychain $certpath
   fi
   printf "[CERTIFICATE] Certificate added from\n${certpath}"
