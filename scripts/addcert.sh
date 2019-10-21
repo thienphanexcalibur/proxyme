@@ -1,4 +1,5 @@
 #!/bin/bash
+platform = $(uname)
 set -e
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -18,12 +19,19 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-# set certificate path
+printf "[CERTIFICATE] Detect you are using $platform"
+
+# set certificate path - Linux only
 certpath="${PUBLICPATH}/.http-mitm-proxy/certs/ca.pem"
 
 #try/catch bash
 {
-  certutil -d sql:$HOME/.pki/nssdb -A -t "CT,C,C" -n "PROXYMECERT" -i $certpath
+  if [[$platform == 'Linux']]; then
+	  certutil -d sql:$HOME/.pki/nssdb -A -t "CT,C,C" -n "PROXYMECERT" -i $certpath
+  fi
+  if [[$platform == 'Darwin']]; then
+	  sudo security add-trusted-cert -d -r trustRoot -k $HOME/Library/Keychains/login.keychain $certpath
+  fi
   printf "[CERTIFICATE] Certificate added from\n${certpath}"
 } || {
   printf "[CERTIFICATE] Something wrong while trying to add proxyme certificate"
