@@ -1,5 +1,5 @@
 #!/bin/bash
-platform = $(uname)
+platform=$(uname)
 set -e
 POSITIONAL=()
 while [[ $# -gt 0 ]]
