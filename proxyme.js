@@ -10,7 +10,7 @@ const chalk = require('chalk');
 module.exports = function proxyMe(args) {
   // Destructuring arguments
   const {
-    publicPath,
+    publicPath = './',
     pac,
     proxyHost,
     proxyPort,
@@ -63,6 +63,13 @@ module.exports = function proxyMe(args) {
   spawn('bash', ['attach.script', '--pac', pac], {
     cwd: path.join(__dirname, 'scripts')
   });
+ proxy.onCertificateRequired = function(hostname, callback) {
+	 console.log(publicPath);
+	  return callback(null, {
+		  keyFile: path.resolve(process.cwd(), 'certs/coccoc.com+1-key.pem'),
+		  certFile: path.resolve(process.cwd(), 'certs/coccoc.com+1.pem')
+	  });
+	};
 
   proxy.onRequest(function (ctx, callback) {
     ctx.use(Proxy.gunzip);
@@ -72,6 +79,7 @@ module.exports = function proxyMe(args) {
     // Log
     console.log(remoteAddress, ' requests ', ctx.clientToProxyRequest.url);
 
+   
     // Transport to socket
     io.emit('request', `${remoteAddress} requests ${url}`)
 
@@ -89,7 +97,7 @@ module.exports = function proxyMe(args) {
           for(iterPath in mapPaths) {
             const [mapPath, pathMapping] = mapPaths[iterPath];
             if (url.match(new RegExp(iterPath))) {
-              ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(new RegExp(`^/${iterPath}$`), '');
+              ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(new RegExp(`^/${iterPath}`), '');
               ctx.proxyToServerRequestOptions.host = pathMapping.host;
               ctx.proxyToServerRequestOptions.port = pathMapping.port;
               return callback();
