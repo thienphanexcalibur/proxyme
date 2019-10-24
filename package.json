@@ -4,7 +4,7 @@
   "description": "A CLI for setup proxy server with Web GUI traffic monitoring",
   "main": "index.js",
   "scripts": {
-    "test": "sudo npm unlink && sudo npm link",
+    "test": "npm version patch && sudo npm unlink && sudo npm link",
     "debug": "nodemon --inspect ./cli.js",
     "publish-npm": "npm version patch && git push && git push --tags && npm publish"
   },
