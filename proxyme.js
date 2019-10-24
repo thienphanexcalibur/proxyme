@@ -131,7 +131,8 @@ module.exports = function proxyMe(args) {
 
   proxy.listen({
     host: proxyHost,
-    port: proxyPort
+    port: proxyPort,
+    keepAlive: true
   })
   // Revert global proxy configuration
   process.on('SIGINT', () => {
