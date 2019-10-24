@@ -66,8 +66,8 @@ module.exports = function proxyMe(args) {
  proxy.onCertificateRequired = function(hostname, callback) {
 	 console.log(publicPath);
 	  return callback(null, {
-		  keyFile: path.resolve(process.cwd(), 'certs/coccoc.com+1-key.pem'),
-		  certFile: path.resolve(process.cwd(), 'certs/coccoc.com+1.pem')
+		  keyFile: path.resolve(__dirname, 'certs/coccoc.com+1-key.pem'),
+		  certFile: path.resolve(__dirname, 'certs/coccoc.com+1.pem')
 	  });
 	};
 
