@@ -7,6 +7,9 @@ const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const chalk = require('chalk');
+
+const pluginPath = path.resolve(process.cwd(), 'plugins');
+const plugins = require(pluginPath);
 module.exports = function proxyMe(args) {
   // Destructuring arguments
   const {
@@ -97,9 +100,14 @@ module.exports = function proxyMe(args) {
           for(iterPath in mapPaths) {
             const [mapPath, pathMapping] = mapPaths[iterPath];
             if (url.match(new RegExp(iterPath))) {
-              ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(`/${iterPath}`, '');
+  
+       ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(`/${iterPath}`, '');
               ctx.proxyToServerRequestOptions.host = pathMapping.host;
               ctx.proxyToServerRequestOptions.port = pathMapping.port;
+	      // Run plugin after this sections
+	      if (plugin) {
+              	plugins.apply(this, ctx);
+	      }
               return callback();
             }
           }
