@@ -9,6 +9,9 @@ const path = require('path');
 const chalk = require('chalk');
 
 const pluginPath = path.resolve(process.cwd(), 'plugins');
+if (pluginPath) {
+	console.log(chalk.green('Your plugin path', pluginPath));
+}
 const plugins = require(pluginPath);
 module.exports = function proxyMe(args) {
   // Destructuring arguments
@@ -105,7 +108,7 @@ module.exports = function proxyMe(args) {
               ctx.proxyToServerRequestOptions.host = pathMapping.host;
               ctx.proxyToServerRequestOptions.port = pathMapping.port;
 	      // Run plugin after this sections
-	      if (plugin) {
+	      if (plugins) {
               	plugins.apply(this, ctx);
 	      }
               return callback();
