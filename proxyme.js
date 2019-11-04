@@ -109,7 +109,7 @@ module.exports = function proxyMe(args) {
               ctx.proxyToServerRequestOptions.port = pathMapping.port;
 	      // Run plugin after this sections
 	      if (plugins) {
-              	plugins.apply(this, ctx);
+              	plugins.call(this, ctx);
 	      }
               return callback();
             }
