@@ -17,7 +17,7 @@ commander
   .option('-p, --proxyPort', 'your proxy port - default 6969')
   .option('-H, --debugHost', 'your debug host - default 0.0.0.0')
   .option('-P, --debugPort', 'your debug port - default 2300')
-  .option('--pac', 'your PAC (Proxy Auto-Config) URL:')
+  .option('--pac', 'your PAC (Proxy Auto-Config) URL - default 6970')
   .option('--config', 'your config path')
   .option('--profile', 'your profile contain rules path')
   .version(getVersion())
