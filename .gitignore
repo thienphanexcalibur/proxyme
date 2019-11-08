@@ -6,3 +6,4 @@ proxyme/
 config/
 profiles/
 certs/*
+*.swp

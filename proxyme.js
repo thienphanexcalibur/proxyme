@@ -1,32 +1,40 @@
 const Proxy = require('http-mitm-proxy');
 const proxy = Proxy();
 const {
-  spawn
+	spawn,
+	exec
 } = require('child_process');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const chalk = require('chalk');
-
+let plugins = null;
+	
 const pluginPath = path.resolve(process.cwd(), 'plugins');
-if (pluginPath) {
+
+// Check if plugin paths exists then make a closure ;)
+if (fs.existsSync(pluginPath)) {
 	console.log(chalk.green('Your plugin path', pluginPath));
+	plugins = require(pluginPath);
 }
-const plugins = require(pluginPath);
+
 module.exports = function proxyMe(args) {
-  // Destructuring arguments
   const {
-    publicPath = './',
+		publicPath = process.cwd(),
     pac,
     proxyHost,
     proxyPort,
     debugHost,
     debugPort,
-    rules
+		rules,
+		certDir
   } = args;
+	console.log(certDir);
 
-  /* Setup debug server to display all traffics from proxy */
-  const debugServer = http.createServer((req, res) => {
+	console.log('Your certificate directory:', certDir);
+	/* Setup debug server 
+		* to display all traffics from proxy */
+    const debugServer = http.createServer((req, res) => {
     const staticBasePath = __dirname;
     const resolvedBase = path.resolve(staticBasePath);
     const safeSuffix = path.normalize(req.url).replace(/^(\.\.[\/\\])+/, '');
@@ -52,6 +60,7 @@ module.exports = function proxyMe(args) {
         return res.end();
     });
   });
+
   debugServer.listen({
     host: debugHost,
     port: debugPort
@@ -60,26 +69,25 @@ module.exports = function proxyMe(args) {
   });
 
   const io = require('socket.io')(debugServer);
-  io.on('connection', (socket) => {
-    socket.emit('soundcheck', 'hello');
-  });
 
-  /** */
-  // Inject global PAC file for determine proxy traffics
-  spawn('bash', ['attach.script', '--pac', pac], {
+/* Inject global PAC file for determine proxy traffics */
+  spawn('bash', ['attach.sh', '--pac', pac], {
     cwd: path.join(__dirname, 'scripts')
   });
- proxy.onCertificateRequired = function(hostname, callback) {
-	 console.log(publicPath);
-	  return callback(null, {
-		  keyFile: path.resolve(__dirname, 'certs/coccoc.com+1-key.pem'),
-		  certFile: path.resolve(__dirname, 'certs/coccoc.com+1.pem')
-	  });
-	};
+
+	if (certDir) {
+		proxy.onCertificateRequired = function(hostname, callback) {
+				return callback(null, {
+					keyFile: path.resolve(process.cwd(), 'certs/coccoc.com+1-key.pem'),
+					certFile: path.resolve(process.cwd(), 'certs/coccoc.com+1.pem')
+				});
+		};
+	}
 
   proxy.onRequest(function (ctx, callback) {
     ctx.use(Proxy.gunzip);
     const remoteAddress = ctx.clientToProxyRequest.connection.remoteAddress;
+
     let url = ctx.clientToProxyRequest.url;
     const host = ctx.clientToProxyRequest.headers.host;
     // Log
@@ -123,7 +131,7 @@ module.exports = function proxyMe(args) {
     return callback();
   });
 
-  const certProcess = spawn('bash', ['addcert.sh', '--publicPath', process.cwd()], {
+  const certProcess = spawn('bash', ['addcert.sh', '--publicPath', process.cwd(), '--certDir', certDir], {
     cwd: path.join(__dirname, 'scripts')
   });
 
@@ -133,7 +141,6 @@ module.exports = function proxyMe(args) {
       console.log(`${chalk.bgBlue.black(data.toString())}\n`);
     }
   });
-
 
   proxy.onError((ctx, err, errorKind) => {
     console.log(err);
@@ -148,7 +155,7 @@ module.exports = function proxyMe(args) {
   // Revert global proxy configuration
   process.on('SIGINT', () => {
     console.log(chalk.bgWhite.black('\nRemoved global PAC configuration\n'), pac);
-    spawn('bash', ['detach.script'], {
+    spawn('bash', ['detach.sh'], {
       cwd: path.join(__dirname, 'scripts')
     });
     console.log(chalk.bgWhite.black('Removed proxyme certificate!'));
