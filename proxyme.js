@@ -29,9 +29,11 @@ module.exports = function proxyMe(args) {
 		rules,
 		certDir
   } = args;
-	console.log(certDir);
 
-	console.log('Your certificate directory:', certDir);
+	if (certDir) {
+		console.log(chalk.bgWhite.black('Your certificate directory:', certDir));
+	}
+
 	/* Setup debug server 
 		* to display all traffics from proxy */
     const debugServer = http.createServer((req, res) => {
@@ -78,8 +80,8 @@ module.exports = function proxyMe(args) {
 	if (certDir) {
 		proxy.onCertificateRequired = function(hostname, callback) {
 				return callback(null, {
-					keyFile: path.resolve(process.cwd(), 'certs/*-key.pem'),
-					certFile: path.resolve(process.cwd(), 'certs/*+1.pem')
+					keyFile: path.resolve(certDir, `${hostname}-key.pem`),
+					certFile: path.resolve(certDir, `${hostname}-cert.pem`)
 				});
 		};
 	}

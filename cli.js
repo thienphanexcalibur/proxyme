@@ -6,6 +6,7 @@ const path = require('path');
 const proxyMe = require('./proxyme.js');
 const chalk = require('chalk');
 const commander = require('commander');
+const {exec} = require('child_process');
 
 /* Dirty hack to get current npm version */
 function getVersion() {
@@ -45,6 +46,7 @@ if (!fs.existsSync(publicPath)) {
 
 if (!fs.existsSync(certPath)) {
   fs.mkdirSync(certPath);
+	
 }
 
 	/*   Profiles Directory     */
@@ -164,7 +166,8 @@ const questions = [];
     name: 'input',
     name: 'proxyPort',
     message: 'Your proxy port:',
-    default: 6969 });
+		default: 6969 
+	});
   questions.push({
     type: 'input',
     name: 'pac',
