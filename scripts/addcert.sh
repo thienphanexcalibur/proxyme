@@ -1,5 +1,4 @@
 #!/bin/bash
-// Temporary fix env to Linux to use default node-mitm certificate
 platform=$(uname)
 set -e
 POSITIONAL=()
@@ -27,6 +26,8 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 printf "[CERTIFICATE] Detect you are using $platform"
 
+if [[ ! $CERTDIR ]]; then
+ $CERTDIR = "${PUBLICPATH}/.http-mitm-proxy/certs/ca.pem"
 
 #try/catch bash
 {
