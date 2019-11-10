@@ -9,15 +9,12 @@ const http = require('http');
 const path = require('path');
 const chalk = require('chalk');
 let plugins = null;
-	
 const pluginPath = path.resolve(process.cwd(), 'plugins');
-
 // Check if plugin paths exists then make a closure ;)
 if (fs.existsSync(pluginPath)) {
 	console.log(chalk.green('Your plugin path', pluginPath));
 	plugins = require(pluginPath);
 }
-
 module.exports = function proxyMe(args) {
   const {
 		publicPath = process.cwd(),
@@ -79,6 +76,7 @@ module.exports = function proxyMe(args) {
 
 	if (certDir) {
 		proxy.onCertificateRequired = function(hostname, callback) {
+			console.log(hostname);
 				return callback(null, {
 					keyFile: path.resolve(certDir, `${hostname}-key.pem`),
 					certFile: path.resolve(certDir, `${hostname}-cert.pem`)
@@ -89,12 +87,10 @@ module.exports = function proxyMe(args) {
   proxy.onRequest(function (ctx, callback) {
     ctx.use(Proxy.gunzip);
     const remoteAddress = ctx.clientToProxyRequest.connection.remoteAddress;
-
     let url = ctx.clientToProxyRequest.url;
     const host = ctx.clientToProxyRequest.headers.host;
     // Log
     console.log(remoteAddress, ' requests ', ctx.clientToProxyRequest.url);
-
    
     // Transport to socket
     io.emit('request', `${remoteAddress} requests ${url}`)
@@ -104,32 +100,29 @@ module.exports = function proxyMe(args) {
       ctx.isSSL = false;;
       ctx.proxyToServerRequestOptions.agent = proxy.httpAgent;
     }
-
     let hostMatched = rules[host];
     // Add more logic here
     // [NOTICE] Currently support only level 1 path
-      if (hostMatched) {
+		if (hostMatched) {
       let [mapPaths, hostMapping] = hostMatched;
-          for(iterPath in mapPaths) {
-            const [mapPath, pathMapping] = mapPaths[iterPath];
-            if (url.match(new RegExp(iterPath))) {
-  
-       ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(`/${iterPath}`, '');
-              ctx.proxyToServerRequestOptions.host = pathMapping.host;
-              ctx.proxyToServerRequestOptions.port = pathMapping.port;
-	      // Run plugin after this sections
-	      if (plugins) {
-              	plugins.call(this, ctx);
-	      }
-              return callback();
-            }
-          }
-        if (hostMapping && hostMapping instanceof Object) {
-          ctx.proxyToServerRequestOptions.host = hostMapping.host;
-          ctx.proxyToServerRequestOptions.port = hostMapping.port;
-        }
+			for(iterPath in mapPaths) {
+				const [mapPath, pathMapping] = mapPaths[iterPath];
+				if (url.match(new RegExp(iterPath))) {
+					ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(`/${iterPath}`, '');
+					ctx.proxyToServerRequestOptions.host = pathMapping.host;
+					ctx.proxyToServerRequestOptions.port = pathMapping.port;
+		// Run plugin after this sections
+					if (plugins) {
+							plugins.call(this, ctx);
+					}
+					return callback();
+				}
+			}
+			if (hostMapping && hostMapping instanceof Object) {
+				ctx.proxyToServerRequestOptions.host = hostMapping.host;
+				ctx.proxyToServerRequestOptions.port = hostMapping.port;
+			}
     }
-
     return callback();
   });
 

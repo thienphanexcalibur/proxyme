@@ -23,8 +23,4 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 gsettings set org.gnome.system.proxy autoconfig-url "${PAC}"
 gsettings set org.gnome.system.proxy mode 'auto'
 fi
-if [ $platform == "Darwin" ]
-then
-	networksetup -setautoproxyurl "Wi-Fi" $PAC
-fi
 
