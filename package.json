@@ -1,6 +1,6 @@
 {
   "name": "coccoc-proxyme",
-  "version": "1.3.35",
+  "version": "1.3.36",
   "description": "A CLI for setup proxy server with Web GUI traffic monitoring",
   "main": "index.js",
   "scripts": {
