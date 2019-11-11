@@ -6,7 +6,6 @@ const path = require('path');
 const proxyMe = require('./proxyme.js');
 const chalk = require('chalk');
 const commander = require('commander');
-const {exec} = require('child_process');
 
 /* Dirty hack to get current npm version */
 function getVersion() {
@@ -46,7 +45,7 @@ if (!fs.existsSync(publicPath)) {
 
 if (!fs.existsSync(certPath)) {
   fs.mkdirSync(certPath);
-	
+
 }
 
 	/*   Profiles Directory     */
@@ -166,7 +165,7 @@ const questions = [];
     name: 'input',
     name: 'proxyPort',
     message: 'Your proxy port:',
-		default: 6969 
+		default: 6969
 	});
   questions.push({
     type: 'input',
@@ -201,9 +200,9 @@ module.exports = (async () => {
     console.log('Your settings: ', {...answers});
     proxyMe(answers);
   } else {
-		const finalArgs = 
-			argsCLI.configPath ? 
-				new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, argsCLI.certDir)) 
+		const finalArgs =
+			argsCLI.configPath ?
+				new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, argsCLI.certDir))
 			: cli.mergeArgs(null, argsCLI.profilePath, argsCLI.certDir);
     const {proxyHost, proxyPort, pac, debugHost, debugPort, certDir} = finalArgs;
     console.log(`
