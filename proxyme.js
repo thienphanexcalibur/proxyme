@@ -99,7 +99,7 @@ module.exports = function proxyMe(args) {
 
     // If https protocol
     if (ctx.proxyToServerRequestOptions.agent.protocol === 'https:') {
-      ctx.isSSL = false;;
+      ctx.isSSL = false;
       ctx.proxyToServerRequestOptions.agent = proxy.httpAgent;
     }
 
@@ -116,18 +116,17 @@ module.exports = function proxyMe(args) {
         if (url.match(new RegExp(iterPath))) {
           ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(`/${iterPath}`, '');
           ctx.proxyToServerRequestOptions.host = pathMapping.host;
-          ctx.proxyToServerRequestOptions.port = pathMapping.port;
-          // Run plugin after this sections
-          if (plugins) {
-            plugins.call(this, ctx);
-          }
-          return callback();
-        }
+					ctx.proxyToServerRequestOptions.port = pathMapping.port;
+				}
       }
       if (hostMapping && hostMapping instanceof Object) {
         ctx.proxyToServerRequestOptions.host = hostMapping.host;
         ctx.proxyToServerRequestOptions.port = hostMapping.port;
-      }
+			}
+			// Run plugin after this sections
+    }
+		if (plugins) {
+            plugins.call(this, ctx);
     }
     return callback();
   });
