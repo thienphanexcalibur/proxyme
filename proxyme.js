@@ -76,14 +76,19 @@ module.exports = function proxyMe(args) {
     cwd: path.join(__dirname, 'scripts')
   });
 
-  if (certDir) {
+	/* if (certDir) {
     proxy.onCertificateRequired = function (hostname, callback) {
-      console.log(hostname);
       return callback(null, {
         keyFile: path.resolve(certDir, `${hostname}-key.pem`),
         certFile: path.resolve(certDir, `${hostname}-cert.pem`)
       });
     };
+		*/
+		proxy.onCertificateMissing = function (ctx, files, callback) {
+			return callback(null, {
+					keyFileData: path.resolve(certDir, `${ctx.hostname}-key.pem`),
+					certFileData: path.resolve(certDir, `${ctx.hostname}-cert.pem`)
+			});
   }
   proxy.onRequest(function (ctx, callback) {
     ctx.use(Proxy.gunzip);
