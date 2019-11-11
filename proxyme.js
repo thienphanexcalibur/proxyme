@@ -8,6 +8,7 @@ const http = require('http');
 const path = require('path');
 const chalk = require('chalk');
 let plugins = null;
+	
 const pluginPath = path.resolve(process.cwd(), 'plugins');
 
 // Check if plugin paths exists then make a closure ;)
@@ -84,10 +85,10 @@ module.exports = function proxyMe(args) {
       });
     };
   }
-
   proxy.onRequest(function (ctx, callback) {
     ctx.use(Proxy.gunzip);
     const remoteAddress = ctx.clientToProxyRequest.connection.remoteAddress;
+
     let url = ctx.clientToProxyRequest.url;
     const host = ctx.clientToProxyRequest.headers.host;
     // Log
@@ -101,6 +102,7 @@ module.exports = function proxyMe(args) {
       ctx.isSSL = false;;
       ctx.proxyToServerRequestOptions.agent = proxy.httpAgent;
     }
+
     let hostMatched = rules[host];
     // Add more logic here
     // [NOTICE] Currently support only level 1 path
