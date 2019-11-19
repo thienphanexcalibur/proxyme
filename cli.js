@@ -36,7 +36,7 @@ delete argsCLI._;
 
 	/* Set public path, can be overwritten through cli, default -  process.cwd() */
 const publicPath = argsCLI.publicPath ||  process.cwd();
-
+const certPath = argsCLI.certDir;
 	/* Directories making */
 if (!fs.existsSync(publicPath)) {
   fs.mkdirSync(publicPath);
@@ -44,7 +44,6 @@ if (!fs.existsSync(publicPath)) {
 
 if (!fs.existsSync(certPath)) {
   fs.mkdirSync(certPath);
-
 }
 
 	/*   Profiles Directory     */
