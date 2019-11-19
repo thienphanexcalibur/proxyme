@@ -41,9 +41,9 @@ const certPath = argsCLI.certDir;
 if (!fs.existsSync(publicPath)) {
   fs.mkdirSync(publicPath);
 }
-
-if (!fs.existsSync(certPath)) {
-  fs.mkdirSync(certPath);
+let returnCertPath = certPath || path.resolve(process.cwd(), 'certs');
+if (!fs.existsSync(returnCertPath)) {
+  fs.mkdirSync(returnCertPath);
 }
 
 	/*   Profiles Directory     */
