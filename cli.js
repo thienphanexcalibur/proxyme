@@ -36,7 +36,6 @@ delete argsCLI._;
 
 	/* Set public path, can be overwritten through cli, default -  process.cwd() */
 const publicPath = argsCLI.publicPath ||  process.cwd();
-const certPath = path.resolve(process.cwd(), 'certs');
 
 	/* Directories making */
 if (!fs.existsSync(publicPath)) {
@@ -57,8 +56,6 @@ const defaultProfilePath = path.normalize(path.join(profileDirPath, 'default.jso
 const configDirPath = path.join(publicPath, 'config');
 
 const defaultConfigPath = path.normalize(path.join(configDirPath, 'config.json'));
-
-const defaultCertPath = certPath;
 
 function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort, certDir}) {
   // Check if profile directory path exists
@@ -139,7 +136,7 @@ cli.getProfiles = function (_path) {
 }
 
 cli.getCertDir = function (_path) {
-	return {certDir: _path || defaultCertPath}
+	return {certDir: _path}
 }
 
 /**

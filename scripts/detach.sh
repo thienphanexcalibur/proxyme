@@ -2,8 +2,8 @@
 platform=$(uname)
 if [ $platform=="Linux" ]
 then
-	gsettings set org.gnome.system.proxy mode 'none'
-	gsettings set org.gnome.system.proxy autoconfig-url ''
+	export http_proxy=""
+	export https_proxy=""
 	certutil -d sql:$HOME/.pki/nssdb -D -n PROXYMECERT
 fi
 if [ $platform == 'Darwin' ]

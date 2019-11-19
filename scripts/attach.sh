@@ -20,8 +20,8 @@ done
 if [ $platform=="Linux" ]
 then
 set -- "${POSITIONAL[@]}" # restore positional parameters
-gsettings set org.gnome.system.proxy autoconfig-url "${PAC}"
-gsettings set org.gnome.system.proxy mode 'auto'
+export http_proxy="${PAC}"
+export https_proxy="${PAC}"
 fi
 if [ $platform == "Darwin" ]
 then
