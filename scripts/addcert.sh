@@ -26,9 +26,6 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 printf "[CERTIFICATE] Detect you are using $platform"
 
-if [[ ! $CERTDIR ]]; then
- $CERTDIR = "${PUBLICPATH}/.http-mitm-proxy/certs/ca.pem"
-
 #try/catch bash
 {
   if [ $platform == "Linux" ] 
@@ -37,7 +34,7 @@ if [[ ! $CERTDIR ]]; then
   fi
   if [ $platform == "Darwin" ] 
   then
-	  sudo security add-trusted-cert -d -r trustRoot -k $HOME/Library/Keychains/login.keychain $certpath
+	  sudo security add-trusted-cert -d -r trustRoot -k $HOME/Library/Keychains/login.keychain $CERTDIR
   fi
   printf "[CERTIFICATE] Certificate added from\n$CERTDIR"
 } || {

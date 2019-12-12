@@ -27,7 +27,6 @@ commander
   .version(getVersion())
   .parse(process.argv);
 
-
 	/* CLI Arguments parsing */
 const argsCLI = minimist(process.argv.slice(2));
 
@@ -36,17 +35,19 @@ delete argsCLI._;
 
 	/* Set public path, can be overwritten through cli, default -  process.cwd() */
 const publicPath = argsCLI.publicPath ||  process.cwd();
-const certPath = argsCLI.certDir;
+const certPath = argsCLI.certDir || path.resolve(publicPath, '.http-mitm-proxy/certs','ca.pem');
+
 	/* Directories making */
 if (!fs.existsSync(publicPath)) {
-  fs.mkdirSync(publicPath);
+	fs.mkdirSync(publicPath);
 }
+
 let returnCertPath = certPath || path.resolve(process.cwd(), 'certs');
 if (!fs.existsSync(returnCertPath)) {
   fs.mkdirSync(returnCertPath);
 }
 
-	/*   Profiles Directory     */
+	/* Profiles Directory */
 const profileDirPath = path.join(publicPath, 'profiles');
 
 const defaultProfilePath = path.normalize(path.join(profileDirPath, 'default.json'));
@@ -145,7 +146,7 @@ cli.getCertDir = function (_path) {
  */
 cli.mergeArgs = function (configPath, profilePath, certPath) {
 	// Merge down everything
-  return Object.assign(this.getConfig(configPath), this.getProfiles(profilePath), this.getCertDir(certPath), argsCLI);
+  return Object.assign(this.getCertDir(certPath), this.getConfig(configPath), this.getProfiles(profilePath), argsCLI);
 }
 
 const questions = [];
@@ -199,7 +200,7 @@ module.exports = (async () => {
 		const finalArgs =
 			argsCLI.configPath ?
 				new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, argsCLI.certDir))
-			: cli.mergeArgs(null, argsCLI.profilePath, argsCLI.certDir);
+			: cli.mergeArgs(null, argsCLI.profilePath, certPath);
     const {proxyHost, proxyPort, pac, debugHost, debugPort, certDir} = finalArgs;
     console.log(`
 		  Your PROXYME settings:

@@ -96,16 +96,17 @@ module.exports = function proxyMe(args) {
     // Transport to socket
     io.emit('request', `${remoteAddress} requests ${url}`)
 
-    // If https protocol
-    if (ctx.proxyToServerRequestOptions.agent.protocol === 'https:') {
-      ctx.isSSL = false;
-      ctx.proxyToServerRequestOptions.agent = proxy.httpAgent;
-    }
-
+  
     let hostMatched = rules[host];
     // Add more logic here
     // [NOTICE] Currently support only level 1 path
     if (hostMatched) {
+		// If https protocol
+			if (ctx.proxyToServerRequestOptions.agent.protocol === 'https:') {
+				ctx.isSSL = false;
+				ctx.proxyToServerRequestOptions.agent = proxy.httpAgent;
+			}
+
       let [mapPaths, hostMapping] = hostMatched;
       for (iterPath in mapPaths) {
         /*
