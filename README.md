@@ -20,9 +20,10 @@ This CLI fits these real-life development scenarios:
 ```npm i -g coccoc-proxyme```
 
 ## Quick setup:
-``` proxyme --init ```
-Usage: proxyme [options]
+``` proxyme --help ```
 
+```
+Usage: proxyme [options]
 Options:
   --init         Init proxyme
   --publicPath   Set your proxyme public path, where to generate necessary files - default ./
@@ -36,19 +37,26 @@ Options:
   --certDir      Your certificate directory - should be in ./certs
   -V, --version  output the version number
   -h, --help     output usage information
+```
 
 ```--init```: Generate proxyme settings in the current folder, you can also specify publicPath where it generates necessary files. Default: ```./```
 After init, the proxyme settings will be like this:
 
-```--publicPath```: where you wants to generate settings
+```--publicPath```:
+Where you wants to generate settings
 
-```--pac```: (Optional) Your Proxy Auto Config URL. For example: http://0.0.0.0:6970/index.pac
+```--pac```: 
+(Optional) Your Proxy Auto Config URL. For example: http://0.0.0.0:6970/index.pac
 
-```--debugHost``` ```debugPort```: Host and port for setup web GUI monitoring/debug toool.
+```--debugHost``` ```debugPort```: 
+Host and port for setup web GUI monitoring/debug toool.
 
-```--profile```: Your proxyme profile configuration. The ```default.json``` has already generated for you when init:
+```--profile```: 
+Your proxyme profile configuration. The ```default.json``` has already generated for you when init:
 Currently PROXYME only supports level 1 path
-```{
+
+``` 
+{
 	"rules": {
 		"example.com": [
 			{
@@ -66,11 +74,15 @@ Currently PROXYME only supports level 1 path
 			}
 		]
 	}
-}```
+} 
+```
 
-```example.com``` is the targeted domain Eg. abc.com
-```somepath``` is the next level path. Eg: abc.com/posts
+```example.com```: is the targeted domain. Eg. abc.com
+
+```somepath```: is the next level path. Eg: abc.com/posts
+
 ```host```: is the target host you want to direct to
+
 ```port```: is the targeted port you want to direct to
 
 
