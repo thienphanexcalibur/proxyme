@@ -21,8 +21,8 @@ commander
   .option('--debugHost', 'Your debug host - default 0.0.0.0')
   .option('--debugPort', 'Your debug port - default 2300')
   .option('--pac', 'Your PAC (Proxy Auto-Config) URL - default 6970')
-  .option('--config', 'Your config path')
-  .option('--profile', 'Your profile contain rules path')
+  .option('--configPath', 'Your config path')
+  .option('--profilePath', 'Your profile contain rules path')
   .option('--certDir', 'Your certificate directory - should be in ./certs')
   .version(getVersion())
   .parse(process.argv);
@@ -200,7 +200,7 @@ module.exports = (async () => {
 		const finalArgs =
 			argsCLI.configPath ?
 				new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, argsCLI.certDir))
-			: cli.mergeArgs(null, argsCLI.profilePath, certPath);
+			: cli.mergeArgs(null, argsCLI.configPath, argsCLI.profilePath, certPath);
     const {proxyHost, proxyPort, pac, debugHost, debugPort, certDir} = finalArgs;
     console.log(`
 		  Your PROXYME settings:
