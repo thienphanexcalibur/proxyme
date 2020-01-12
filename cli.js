@@ -135,7 +135,7 @@ cli.getConfig = function (_path) {
  * (Static Method)
  */
 cli.getProfiles = function (_path) {
-  return JSON.parse(fs.readFileSync(path.resolve(__dirname, _path) || defaultProfilePath));
+  return JSON.parse(fs.readFileSync(_path || defaultProfilePath));
 }
 
 cli.getCertDir = function (_path) {
