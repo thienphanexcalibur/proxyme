@@ -29,6 +29,9 @@ commander
 
 	/* CLI Arguments parsing */
 const argsCLI = minimist(process.argv.slice(2));
+if (argsCLI.debug) {
+	console.log(argsCLI);
+}
 
 	/* Using minimist arguments parsing can append "_" key - we want out object clean */
 delete argsCLI._;
@@ -132,7 +135,7 @@ cli.getConfig = function (_path) {
  * (Static Method)
  */
 cli.getProfiles = function (_path) {
-  return JSON.parse(fs.readFileSync(_path || defaultProfilePath));
+  return JSON.parse(fs.readFileSync(path.resolve(__dirname, _path) || defaultProfilePath));
 }
 
 cli.getCertDir = function (_path) {
