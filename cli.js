@@ -147,7 +147,7 @@ cli.getCertDir = function (_path) {
  * @param {String} profilePath | Passed from CLI
  * (Static Method)
  */
-cli.mergeArgs = function (configPath, profilePath, certPath) {
+cli.mergeArgs = function (config, configPath, profilePath, certPath) {
 	// Merge down everything
   return Object.assign(this.getCertDir(certPath), this.getConfig(configPath), this.getProfiles(profilePath), argsCLI);
 }
@@ -203,7 +203,7 @@ module.exports = (async () => {
 		const finalArgs =
 			argsCLI.configPath ?
 				new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, argsCLI.certDir))
-			: cli.mergeArgs(null, argsCLI.configPath, argsCLI.profilePath, certPath);
+			: cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, certPath);
     const {proxyHost, proxyPort, pac, debugHost, debugPort, certDir} = finalArgs;
     console.log(`
 		  Your PROXYME settings:
