@@ -8,7 +8,7 @@ const http = require('http');
 const path = require('path');
 const chalk = require('chalk');
 let plugins = null;
-	
+
 const pluginPath = path.resolve(process.cwd(), 'plugins');
 
 // Check if plugin paths exists then make a closure ;)
@@ -96,7 +96,7 @@ module.exports = function proxyMe(args) {
     // Transport to socket
     io.emit('request', `${remoteAddress} requests ${url}`)
 
-  
+
     let hostMatched = rules[host];
     // Add more logic here
     // [NOTICE] Currently support only level 1 path
@@ -126,7 +126,7 @@ module.exports = function proxyMe(args) {
 			// Run plugin after this sections
     }
 		if (plugins) {
-            plugins.call(this, ctx);
+            plugins.call(this, ctx, proxy);
     }
     return callback();
   });
