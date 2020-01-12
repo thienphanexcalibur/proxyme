@@ -147,7 +147,7 @@ cli.getCertDir = function (_path) {
  * @param {String} profilePath | Passed from CLI
  * (Static Method)
  */
-cli.mergeArgs = function (config, configPath, profilePath, certPath) {
+cli.mergeArgs = function (configPath, profilePath, certPath) {
 	// Merge down everything
   return Object.assign(this.getCertDir(certPath), this.getConfig(configPath), this.getProfiles(profilePath), argsCLI);
 }
