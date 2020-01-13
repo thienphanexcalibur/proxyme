@@ -114,7 +114,9 @@ module.exports = function proxyMe(args) {
         */
         const [mapPath, pathMapping] = mapPaths[iterPath];
         if (url.match(new RegExp(iterPath))) {
-          ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(`/${iterPath}`, '');
+					if (!pathMapping.directWithoutRewrite) {
+						ctx.proxyToServerRequestOptions.path = ctx.proxyToServerRequestOptions.path.replace(`/${iterPath}`, '');
+					}
           ctx.proxyToServerRequestOptions.host = pathMapping.host;
 					ctx.proxyToServerRequestOptions.port = pathMapping.port;
 				}
