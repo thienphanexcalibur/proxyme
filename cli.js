@@ -85,7 +85,6 @@ function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort, cert
     }, null, '\t'));
   }
 
-	fs.unlinkSync(configDirPath);
   if (!fs.existsSync(configDirPath)) {
     fs.mkdirSync(configDirPath);
     fs.writeFileSync(defaultConfigPath, JSON.stringify({
