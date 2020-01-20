@@ -61,7 +61,6 @@ const defaultConfigPath = path.normalize(path.join(configDirPath, 'config.json')
 
 function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort, certDir}) {
   // Check if profile directory path exists
-	fs.unlinkSync(profileDirPath);
   if (!fs.existsSync(profileDirPath)) {
     fs.mkdirSync(profileDirPath);
     fs.writeFileSync(defaultProfilePath, JSON.stringify({
