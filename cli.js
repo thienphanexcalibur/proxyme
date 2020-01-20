@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 const inq = require('inquirer');
-const minimist = require('minimist');
-const fs = require('fs');
+const minimist = require('minimist'); const fs = require('fs');
 const path = require('path');
 const proxyMe = require('./proxyme.js');
 const chalk = require('chalk');
@@ -45,7 +44,7 @@ if (!fs.existsSync(publicPath)) {
 	fs.mkdirSync(publicPath);
 }
 
-let returnCertPath = certPath || path.resolve(process.cwd(), 'certs');
+let returnCertPath = path.resolve(process.cwd(), 'certs');
 if (!fs.existsSync(returnCertPath)) {
   fs.mkdirSync(returnCertPath);
 }
