@@ -94,7 +94,7 @@ function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort, cert
       debugHost,
       debugPort,
       publicPath,
-      certDir
+			certDir
     }, null, '\t'));
   }
 }
