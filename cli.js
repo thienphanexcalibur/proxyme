@@ -94,7 +94,7 @@ function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort, cert
       debugHost,
       debugPort,
       publicPath,
-			certDir
+			certDir: certPath
     }, null, '\t'));
   }
 }
@@ -209,7 +209,7 @@ module.exports = (async () => {
 				PAC Address: ${pac}
 				DEBUG HOST: ${debugHost}
 				DEBUG PORT: ${debugPort}
-				CERTIFICATE DIRECTORY: ${certDir}
+				CERTIFICATE DIRECTORY: ${certPath}
     `)
     proxyMe(finalArgs);
   }

@@ -76,7 +76,7 @@ module.exports = function proxyMe(args) {
     cwd: path.join(__dirname, 'scripts')
   });
 
-	if (certDir) {
+	if (!certDir.match(/ca.pem/)) {
     proxy.onCertificateRequired = function (hostname, callback) {
       return callback(null, {
         keyFile: path.resolve(certDir, `${hostname}-key.pem`),
