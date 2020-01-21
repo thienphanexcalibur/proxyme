@@ -49,8 +49,7 @@ let returnCertPath = path.resolve(process.cwd(), 'certs');
 if (!fs.existsSync(returnCertPath)) {
   fs.mkdirSync(returnCertPath);
 }
-
-	/* Profiles Directory */
+/* Profiles Directory */
 const profileDirPath = path.join(publicPath, 'profiles');
 
 const defaultProfilePath = path.normalize(path.join(profileDirPath, 'default.json'));
@@ -201,7 +200,7 @@ module.exports = (async () => {
 		const finalArgs =
 			argsCLI.configPath ?
 				new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, argsCLI.certDir))
-			: cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, certDir);
+			: cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, argsCLI.certDir);
     const {proxyHost, proxyPort, pac, debugHost, debugPort, certDir} = finalArgs;
     console.log(`
 		  Your PROXYME settings:
