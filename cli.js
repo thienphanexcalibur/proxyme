@@ -28,6 +28,7 @@ commander
 
 	/* CLI Arguments parsing */
 const argsCLI = minimist(process.argv.slice(2));
+
 if (argsCLI.debug) {
 	console.log(argsCLI);
 }
@@ -37,7 +38,7 @@ delete argsCLI._;
 
 	/* Set public path, can be overwritten through cli, default -  process.cwd() */
 const publicPath = argsCLI.publicPath ||  process.cwd();
-const certPath = argsCLI.certDir || path.resolve(publicPath, '.http-mitm-proxy/certs','ca.pem');
+const certDir = argsCLI.certDir || path.resolve(publicPath, '.http-mitm-proxy/certs','ca.pem');
 
 	/* Directories making */
 if (!fs.existsSync(publicPath)) {
@@ -94,7 +95,7 @@ function init({publicPath, pac, proxyHost, proxyPort, debugHost, debugPort, cert
       debugHost,
       debugPort,
       publicPath,
-			certDir: certPath
+			certDir
     }, null, '\t'));
   }
 }
@@ -144,9 +145,9 @@ cli.getCertDir = function (_path) {
  * @param {String} profilePath | Passed from CLI
  * (Static Method)
  */
-cli.mergeArgs = function (configPath, profilePath, certPath) {
+cli.mergeArgs = function (configPath, profilePath, certDir) {
 	// Merge down everything
-  return Object.assign(this.getCertDir(certPath), this.getConfig(configPath), this.getProfiles(profilePath), argsCLI);
+  return Object.assign(this.getCertDir(certDir), this.getConfig(configPath), this.getProfiles(profilePath), argsCLI);
 }
 
 const questions = [];
@@ -200,7 +201,7 @@ module.exports = (async () => {
 		const finalArgs =
 			argsCLI.configPath ?
 				new cli(cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, argsCLI.certDir))
-			: cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, certPath);
+			: cli.mergeArgs(argsCLI.configPath, argsCLI.profilePath, certDir);
     const {proxyHost, proxyPort, pac, debugHost, debugPort, certDir} = finalArgs;
     console.log(`
 		  Your PROXYME settings:
@@ -209,7 +210,7 @@ module.exports = (async () => {
 				PAC Address: ${pac}
 				DEBUG HOST: ${debugHost}
 				DEBUG PORT: ${debugPort}
-				CERTIFICATE DIRECTORY: ${certPath}
+				CERTIFICATE DIRECTORY: ${certDir}
     `)
     proxyMe(finalArgs);
   }
