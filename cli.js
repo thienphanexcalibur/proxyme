@@ -38,7 +38,7 @@ delete argsCLI._;
 
 	/* Set public path, can be overwritten through cli, default -  process.cwd() */
 const publicPath = argsCLI.publicPath ||  process.cwd();
-const certDir = argsCLI.certDir || path.resolve(publicPath, '.http-mitm-proxy/certs','ca.pem');
+const certDir = path.resolve(publicPath, '.http-mitm-proxy/certs','ca.pem');
 
 	/* Directories making */
 if (!fs.existsSync(publicPath)) {
