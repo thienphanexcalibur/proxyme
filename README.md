@@ -111,7 +111,7 @@ profiles
 	"certDir": "[your-init-directory]/.http-mitm-proxy/certs/ca.pem"
 }
 ```
-The default for certificate directory ```[your-init-directory]/.http-mitm-proxy/certs/ca.pem```, 
+* The default for certificate directory ```[your-init-directory]/.http-mitm-proxy/certs/ca.pem```, 
 For custom certificates, navigate to ```certs```. Place a new pair of cert and key with this format.
 ```
 [host]-cert.pem
