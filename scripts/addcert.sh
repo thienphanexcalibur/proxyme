@@ -28,11 +28,11 @@ printf "[CERTIFICATE] Detect you are using $platform"
 
 #try/catch bash
 {
-  if [ $platform == "Linux" ] 
+  if [ $platform == "Linux" ]
   then
 	  certutil -d sql:$HOME/.pki/nssdb -A -t "CT,C,C" -n "PROXYMECERT" -i $CERTDIR
   fi
-  if [ $platform == "Darwin" ] 
+  if [ $platform == "Darwin" ]
   then
 	  sudo security add-trusted-cert -d -r trustRoot -k $HOME/Library/Keychains/login.keychain $CERTDIR
   fi
